@@ -10,4 +10,7 @@ public class PanelItem {
     private Integer drawable;
 
 
+
+    private ItemState state;
+
 }

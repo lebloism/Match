@@ -3,6 +3,9 @@ package mleblois.match.adapter;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -12,6 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 import mleblois.match.R;
+import mleblois.match.model.ItemState;
 import mleblois.match.model.PanelItem;
 
 
@@ -61,8 +65,60 @@ public class ImageAdapter extends BaseAdapter {
         } else {
             imageView = (ImageView) convertView;
         }
+    PanelItem panelItem = items.get(position);
+        imageView.setImageResource(panelItem.getDrawable());
+        if (panelItem.getState()== ItemState.MATCHED){
 
-        imageView.setImageResource(items.get(position).getDrawable());
+            Animation animation = new AlphaAnimation(0.5f, 0.5f); // Change alpha
+            // from fully
+            // visible to
+            // invisible
+            animation.setDuration(500); // duration - half a second
+            animation.setInterpolator(new LinearInterpolator()); // do not alter
+            // animation
+            // rate
+            animation.setRepeatCount(Animation.INFINITE); // Repeat animation
+            // infinitely
+            animation.setRepeatMode(Animation.REVERSE); // Reverse animation at
+
+            imageView.setAnimation(animation);
+        }
+
+        if (panelItem.getState()== ItemState.NORMAL){
+
+            Animation animation = new AlphaAnimation(1, 1); // Change alpha
+            // from fully
+            // visible to
+            // invisible
+            animation.setDuration(500); // duration - half a second
+            animation.setInterpolator(new LinearInterpolator()); // do not alter
+            // animation
+            // rate
+            animation.setRepeatCount(Animation.INFINITE); // Repeat animation
+            // infinitely
+            animation.setRepeatMode(Animation.REVERSE); // Reverse animation at
+
+            imageView.setAnimation(animation);
+        }
+
+
+        if (panelItem.getState()== ItemState.WAITING){
+            //Blinking
+        Animation animation = new AlphaAnimation(1, 0); // Change alpha
+        // from fully
+        // visible to
+        // invisible
+        animation.setDuration(500); // duration - half a second
+        animation.setInterpolator(new LinearInterpolator()); // do not alter
+        // animation
+        // rate
+        animation.setRepeatCount(Animation.INFINITE); // Repeat animation
+        // infinitely
+        animation.setRepeatMode(Animation.REVERSE); // Reverse animation at
+
+        imageView.setAnimation(animation);
+
+        }
         return imageView;
     }
 
