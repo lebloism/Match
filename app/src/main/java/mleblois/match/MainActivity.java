@@ -75,6 +75,18 @@ public class MainActivity extends ActionBarActivity {
                 }
             });
 
+
+            GridView list = (GridView) rootView.findViewById(R.id.list);
+            list.setAdapter(new ImageAdapter(getActivity(),5));
+
+            list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView<?> parent, View v,
+                                        int position, long id) {
+                    Toast.makeText(getActivity(), "" + position,
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+
             return rootView;
         }
     }
