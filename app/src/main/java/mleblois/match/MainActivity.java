@@ -1,15 +1,18 @@
 package mleblois.match;
 
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Build;
+import android.widget.AdapterView;
+import android.widget.GridView;
+import android.widget.Toast;
+
+import mleblois.match.adapter.ImageAdapter;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -60,6 +63,18 @@ public class MainActivity extends ActionBarActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
+            GridView gridview = (GridView) rootView.findViewById(R.id.gridview);
+            gridview.setAdapter(new ImageAdapter(getActivity(),25));
+
+            gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView<?> parent, View v,
+                                        int position, long id) {
+                    Toast.makeText(getActivity(), "" + position,
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+
             return rootView;
         }
     }
