@@ -12,6 +12,8 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import lombok.Getter;
+import lombok.Setter;
 import mleblois.match.adapter.PanelItemAdapter;
 import mleblois.match.model.ItemState;
 import mleblois.match.model.PanelItem;
@@ -63,8 +65,14 @@ public class MainActivity extends ActionBarActivity {
 
         private PanelItemAdapter lineAdapter;
 
-        private Integer currentPanelItemPosition;
-        private Integer currentLineItemPosition;
+        @Getter
+        @Setter
+        private class GameState {
+            private Integer currentPanelItemPosition;
+            private Integer currentLineItemPosition;
+        }
+
+        private GameState gameState = new GameState();
 
         public PlaceholderFragment() {
         }
@@ -108,27 +116,8 @@ public class MainActivity extends ActionBarActivity {
         private void onPanelItemClick(int panelItemPosition){
             Toast.makeText(getActivity(), "" + panelItemPosition,
                     Toast.LENGTH_SHORT).show();
-            PanelItem item =  (PanelItem)  panelAdapter.getItem(panelItemPosition);
 
-            if (item.getState() == ItemState.NORMAL){
-                //C'est cet item qui devient l'élément courant dans le panel
-                if (currentPanelItemPosition!=null) {
-                    ((PanelItem) panelAdapter.getItem(currentPanelItemPosition)).setState(ItemState.NORMAL);
-                }
-
-                item.setState(ItemState.WAITING);
-                currentPanelItemPosition = panelItemPosition;
-                associateIfMatch();
-
-            } else if (item.getState() == ItemState.WAITING){
-                //On clique sur l'élément déjà courant
-                item.setState(ItemState.NORMAL);
-                //On le dé-courantise
-                currentPanelItemPosition = null;
-            }
-
-                //Si élément déjà associé : ne rien faire
-
+            onClick(panelAdapter, panelItemPosition,  lineAdapter, gameState, false);
 
 
         }
@@ -137,39 +126,57 @@ public class MainActivity extends ActionBarActivity {
             Toast.makeText(getActivity(), "" + lineItemPosition,
                     Toast.LENGTH_SHORT).show();
 
-            PanelItem item =  (PanelItem)  lineAdapter.getItem(lineItemPosition);
-            if (item.getState() == ItemState.NORMAL){
-                //C'est cet item qui devient l'élément courant dans la ligne
-                if (currentLineItemPosition!=null) {
-                    ((PanelItem) lineAdapter.getItem(currentLineItemPosition)).setState(ItemState.NORMAL);
-                }
-                item.setState(ItemState.WAITING);
-                currentLineItemPosition = lineItemPosition;
-                associateIfMatch();
+            onClick(lineAdapter, lineItemPosition, panelAdapter, gameState, true);
 
-            } else if (item.getState() == ItemState.WAITING){
-                //On clique sur l'élément déjà courant
+
+        }
+
+
+        private void onClick(PanelItemAdapter adapter, int position, PanelItemAdapter otherAdapter, GameState gameState, boolean clickOnLine) {
+            PanelItem item = (PanelItem) adapter.getItem(position);
+            if (item.getState() == ItemState.NORMAL) {
+                Integer otherBoardWaiting = clickOnLine ? gameState.currentPanelItemPosition : gameState.currentLineItemPosition;
+               Integer previousBoardWaiting = clickOnLine ? gameState.currentLineItemPosition : gameState.currentPanelItemPosition;
+                if (otherBoardWaiting == null) {
+                    if (previousBoardWaiting != null) {
+                        ((PanelItem) adapter.getItem(previousBoardWaiting)).setState(ItemState.NORMAL);
+                    }
+                    item.setState(ItemState.WAITING);
+                    if (clickOnLine){
+                        gameState.setCurrentLineItemPosition(position);
+                    } else {
+                        gameState.setCurrentPanelItemPosition(position);
+                    }
+
+                } else {
+
+                    PanelItem otherBoardWaitingItem = (PanelItem) otherAdapter.getItem(otherBoardWaiting);
+                    if (match(item, otherBoardWaitingItem)) {
+                        otherBoardWaitingItem.setState(ItemState.MATCHED);
+
+                        ((PanelItem) adapter.getItem(position)).setState(ItemState.MATCHED);
+
+
+                        gameState.setCurrentLineItemPosition(null);
+                        gameState.setCurrentPanelItemPosition(null);
+
+
+
+                    }
+                }
+            } else if (item.getState() == ItemState.WAITING) {
+
+                //On annule le WAITING
                 item.setState(ItemState.NORMAL);
-                currentLineItemPosition = null;
-            }
-            //Si élément déjà associé : ne rien faire
-
-
-        }
-
-        private void associateIfMatch(){
-            if (currentLineItemPosition!=null && currentPanelItemPosition!=null){
-                PanelItem panelItem = (PanelItem) panelAdapter.getItem(currentPanelItemPosition);
-                PanelItem lineItem = (PanelItem) lineAdapter.getItem(currentLineItemPosition);
-                if (match(lineItem, panelItem)){
-                    lineItem.setState(ItemState.MATCHED);
-                    panelItem.setState(ItemState.MATCHED);
-                    currentPanelItemPosition = null;
-                    currentLineItemPosition = null;
+                if (clickOnLine){
+                    gameState.setCurrentLineItemPosition(null);
+                } else {
+                    gameState.setCurrentPanelItemPosition(null);
                 }
-            }
 
+            }
         }
+
 
         private boolean match(PanelItem lineItem, PanelItem panelItem){
            return lineItem.getDrawable().equals(panelItem.getDrawable());
