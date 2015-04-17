@@ -12,7 +12,9 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
-import mleblois.match.adapter.ImageAdapter;
+import mleblois.match.adapter.PanelItemAdapter;
+import mleblois.match.model.ItemState;
+import mleblois.match.model.PanelItem;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -56,6 +58,14 @@ public class MainActivity extends ActionBarActivity {
      */
     public static class PlaceholderFragment extends Fragment {
 
+
+        private PanelItemAdapter panelAdapter;
+
+        private PanelItemAdapter lineAdapter;
+
+        private Integer currentPanelItemPosition;
+        private Integer currentLineItemPosition;
+
         public PlaceholderFragment() {
         }
 
@@ -65,29 +75,104 @@ public class MainActivity extends ActionBarActivity {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
             GridView gridview = (GridView) rootView.findViewById(R.id.gridview);
-            gridview.setAdapter(new ImageAdapter(getActivity(),25));
+            panelAdapter = new PanelItemAdapter(getActivity(),25);
+            gridview.setAdapter(panelAdapter);
 
             gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 public void onItemClick(AdapterView<?> parent, View v,
                                         int position, long id) {
-                    Toast.makeText(getActivity(), "" + position,
-                            Toast.LENGTH_SHORT).show();
+                    onPanelItemClick(position);
+                    lineAdapter.notifyDataSetChanged();
+                    panelAdapter.notifyDataSetChanged();
                 }
             });
 
 
             GridView list = (GridView) rootView.findViewById(R.id.list);
-            list.setAdapter(new ImageAdapter(getActivity(),5));
+            lineAdapter = new PanelItemAdapter(getActivity(),5);
+            list.setAdapter(lineAdapter);
 
             list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 public void onItemClick(AdapterView<?> parent, View v,
                                         int position, long id) {
-                                      Toast.makeText(getActivity(), "" + position,
-                            Toast.LENGTH_SHORT).show();
+                    onLineItemClick(position);
+                    lineAdapter.notifyDataSetChanged();
+                    panelAdapter.notifyDataSetChanged();
+
                 }
             });
 
             return rootView;
+        }
+
+        private void onPanelItemClick(int panelItemPosition){
+            Toast.makeText(getActivity(), "" + panelItemPosition,
+                    Toast.LENGTH_SHORT).show();
+            PanelItem item =  (PanelItem)  panelAdapter.getItem(panelItemPosition);
+
+            if (item.getState() == ItemState.NORMAL){
+                //C'est cet item qui devient l'élément courant dans le panel
+                if (currentPanelItemPosition!=null) {
+                    ((PanelItem) panelAdapter.getItem(currentPanelItemPosition)).setState(ItemState.NORMAL);
+                }
+
+                item.setState(ItemState.WAITING);
+                currentPanelItemPosition = panelItemPosition;
+                associateIfMatch();
+
+            } else if (item.getState() == ItemState.WAITING){
+                //On clique sur l'élément déjà courant
+                item.setState(ItemState.NORMAL);
+                //On le dé-courantise
+                currentPanelItemPosition = null;
+            }
+
+                //Si élément déjà associé : ne rien faire
+
+
+
+        }
+
+        private void onLineItemClick(int lineItemPosition){
+            Toast.makeText(getActivity(), "" + lineItemPosition,
+                    Toast.LENGTH_SHORT).show();
+
+            PanelItem item =  (PanelItem)  lineAdapter.getItem(lineItemPosition);
+            if (item.getState() == ItemState.NORMAL){
+                //C'est cet item qui devient l'élément courant dans la ligne
+                if (currentLineItemPosition!=null) {
+                    ((PanelItem) lineAdapter.getItem(currentLineItemPosition)).setState(ItemState.NORMAL);
+                }
+                item.setState(ItemState.WAITING);
+                currentLineItemPosition = lineItemPosition;
+                associateIfMatch();
+
+            } else if (item.getState() == ItemState.WAITING){
+                //On clique sur l'élément déjà courant
+                item.setState(ItemState.NORMAL);
+                currentLineItemPosition = null;
+            }
+            //Si élément déjà associé : ne rien faire
+
+
+        }
+
+        private void associateIfMatch(){
+            if (currentLineItemPosition!=null && currentPanelItemPosition!=null){
+                PanelItem panelItem = (PanelItem) panelAdapter.getItem(currentPanelItemPosition);
+                PanelItem lineItem = (PanelItem) lineAdapter.getItem(currentLineItemPosition);
+                if (match(lineItem, panelItem)){
+                    lineItem.setState(ItemState.MATCHED);
+                    panelItem.setState(ItemState.MATCHED);
+                    currentPanelItemPosition = null;
+                    currentLineItemPosition = null;
+                }
+            }
+
+        }
+
+        private boolean match(PanelItem lineItem, PanelItem panelItem){
+           return lineItem.getDrawable().equals(panelItem.getDrawable());
         }
     }
 }

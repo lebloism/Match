@@ -19,13 +19,13 @@ import mleblois.match.model.ItemState;
 import mleblois.match.model.PanelItem;
 
 
-public class ImageAdapter extends BaseAdapter {
+public class PanelItemAdapter extends BaseAdapter {
     private Context mContext;
     private int size;
     private List<PanelItem> items;
     private Random randomGenerator;
 
-    public ImageAdapter(Context c, int size) {
+    public PanelItemAdapter(Context c, int size) {
         mContext = c;
         this.size = size;
         randomGenerator = new Random();
@@ -46,7 +46,7 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     public Object getItem(int position) {
-        return null;
+        return items.get(position);
     }
 
     public long getItemId(int position) {
@@ -56,17 +56,30 @@ public class ImageAdapter extends BaseAdapter {
     // create a new ImageView for each item referenced by the Adapter
     public View getView(int position, View convertView, ViewGroup parent) {
         ImageView imageView;
-        if (convertView == null) {
+
+        //TODO optimize with recycling views
+
+       // if (convertView == null) {
             // if it's not recycled, initialize some attributes
+           // imageView = new ImageView(mContext);
+            //etc
+        //} else {
+          //  imageView = (ImageView) convertView;
+        //}
+
+
             imageView = new ImageView(mContext);
             imageView.setLayoutParams(new GridView.LayoutParams(85, 85));
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setPadding(8, 8, 8, 8);
-        } else {
-            imageView = (ImageView) convertView;
-        }
+
     PanelItem panelItem = items.get(position);
         imageView.setImageResource(panelItem.getDrawable());
+        Animation currentAnimation =  imageView.getAnimation();
+        if (currentAnimation!=null) {
+            currentAnimation.cancel();
+            imageView.setAnimation(null);
+        }
         if (panelItem.getState()== ItemState.MATCHED){
 
             Animation animation = new AlphaAnimation(0.5f, 0.5f); // Change alpha
@@ -82,9 +95,7 @@ public class ImageAdapter extends BaseAdapter {
             animation.setRepeatMode(Animation.REVERSE); // Reverse animation at
 
             imageView.setAnimation(animation);
-        }
-
-        if (panelItem.getState()== ItemState.NORMAL){
+        } else  if (panelItem.getState()== ItemState.NORMAL){
 
             Animation animation = new AlphaAnimation(1, 1); // Change alpha
             // from fully
@@ -99,10 +110,7 @@ public class ImageAdapter extends BaseAdapter {
             animation.setRepeatMode(Animation.REVERSE); // Reverse animation at
 
             imageView.setAnimation(animation);
-        }
-
-
-        if (panelItem.getState()== ItemState.WAITING){
+        } else   if (panelItem.getState()== ItemState.WAITING){
             //Blinking
         Animation animation = new AlphaAnimation(1, 0); // Change alpha
         // from fully

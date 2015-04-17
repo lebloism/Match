@@ -11,6 +11,6 @@ public class PanelItem {
 
 
 
-    private ItemState state;
+    private ItemState state = ItemState.NORMAL;
 
 }
