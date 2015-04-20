@@ -49,6 +49,15 @@ public class PanelItemAdapter extends BaseAdapter {
         return items.get(position);
     }
 
+    public boolean isAllMatched(){
+        for (PanelItem i : items){
+            if (i.getState()!=ItemState.MATCHED){
+                return false;
+            }
+        }
+        return true;
+    }
+
     public long getItemId(int position) {
         return 0;
     }

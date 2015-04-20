@@ -83,27 +83,42 @@ public class MainActivity extends ActionBarActivity {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
             GridView gridview = (GridView) rootView.findViewById(R.id.gridview);
-            panelAdapter = new PanelItemAdapter(getActivity(),25);
+            panelAdapter = getNewPanelItemAdapter();
             gridview.setAdapter(panelAdapter);
 
             gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 public void onItemClick(AdapterView<?> parent, View v,
                                         int position, long id) {
                     onPanelItemClick(position);
+
+                    if (hasWon()){
+                        onGameWon();
+
+                    }
+
+
                     lineAdapter.notifyDataSetChanged();
                     panelAdapter.notifyDataSetChanged();
+
+
                 }
             });
 
 
             GridView list = (GridView) rootView.findViewById(R.id.list);
-            lineAdapter = new PanelItemAdapter(getActivity(),5);
+            lineAdapter = getNewLineItemAdapter();
             list.setAdapter(lineAdapter);
 
             list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 public void onItemClick(AdapterView<?> parent, View v,
                                         int position, long id) {
                     onLineItemClick(position);
+
+                    if (hasWon()){
+                        onGameWon();
+
+                    }
+
                     lineAdapter.notifyDataSetChanged();
                     panelAdapter.notifyDataSetChanged();
 
@@ -113,22 +128,31 @@ public class MainActivity extends ActionBarActivity {
             return rootView;
         }
 
-        private void onPanelItemClick(int panelItemPosition){
-            Toast.makeText(getActivity(), "" + panelItemPosition,
+        private boolean hasWon(){
+            return lineAdapter.isAllMatched();
+        }
+
+        private void onGameWon() {
+            Toast.makeText(getActivity(), "You won ! New game ...",
                     Toast.LENGTH_SHORT).show();
+            panelAdapter.initializeItems();
+            lineAdapter.initializeItems();
+        }
 
+        private PanelItemAdapter getNewLineItemAdapter() {
+            return new PanelItemAdapter(getActivity(),5);
+        }
+
+        private PanelItemAdapter getNewPanelItemAdapter() {
+            return new PanelItemAdapter(getActivity(),25);
+        }
+
+        private void onPanelItemClick(int panelItemPosition){
             onClick(panelAdapter, panelItemPosition,  lineAdapter, gameState, false);
-
-
         }
 
         private void onLineItemClick(int lineItemPosition){
-            Toast.makeText(getActivity(), "" + lineItemPosition,
-                    Toast.LENGTH_SHORT).show();
-
             onClick(lineAdapter, lineItemPosition, panelAdapter, gameState, true);
-
-
         }
 
 
