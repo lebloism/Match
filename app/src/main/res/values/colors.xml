@@ -19,4 +19,5 @@
 
     <color name="line_background">#000000</color>
     <color name="panel_background">#FFFFFF</color>
+    <color name="main_background">#1d2e6b</color>
 </resources>

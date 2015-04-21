@@ -145,7 +145,6 @@ public class PanelItemAdapter extends BaseAdapter {
 
     // references to our images
     private Integer[] mThumbIds = {
-            R.drawable.sample_2, R.drawable.sample_3,
-            R.drawable.sample_4, R.drawable.sample_5
+            R.drawable.bleu_sombre, R.drawable.lune, R.drawable.orange, R.drawable.rose, R.drawable.terre, R.drawable.vert
     };
 }
