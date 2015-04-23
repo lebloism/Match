@@ -11,6 +11,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -41,12 +42,32 @@ public class PanelItemAdapter extends BaseAdapter {
         }
     }
 
+    public void initializeItems(List<PanelItem> itemsToMatch){
+        items = new ArrayList<>();
+        for (int i=0;i<itemsToMatch.size();i++){
+            PanelItem item = new PanelItem();
+            item.setDrawable(itemsToMatch.get(i).getDrawable());
+            items.add(item);
+        }
+        for (int i=0;i<size-itemsToMatch.size() ;i++){
+            PanelItem item = new PanelItem();
+            item.setDrawable(getRandomDrawable());
+            items.add(item);
+        }
+
+        Collections.shuffle(items,randomGenerator);
+    }
+
     public int getCount() {
         return items.size();
     }
 
     public Object getItem(int position) {
         return items.get(position);
+    }
+
+    public List<PanelItem> getItems(){
+        return items;
     }
 
     public boolean isAllMatched(){
@@ -145,6 +166,6 @@ public class PanelItemAdapter extends BaseAdapter {
 
     // references to our images
     private Integer[] mThumbIds = {
-            R.drawable.bleu_sombre, R.drawable.lune, R.drawable.orange, R.drawable.rose, R.drawable.terre, R.drawable.vert
+            R.drawable.argile, R.drawable.blue, R.drawable.orange_bis, R.drawable.pseudo_lune, R.drawable.rose_bis, R.drawable.rouge, R.drawable.vert_sombre
     };
 }

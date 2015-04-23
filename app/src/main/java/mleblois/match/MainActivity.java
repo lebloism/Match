@@ -125,6 +125,8 @@ public class MainActivity extends ActionBarActivity {
                 }
             });
 
+            initializeGame();
+
             return rootView;
         }
 
@@ -135,8 +137,12 @@ public class MainActivity extends ActionBarActivity {
         private void onGameWon() {
             Toast.makeText(getActivity(), "You won ! New game ...",
                     Toast.LENGTH_SHORT).show();
-            panelAdapter.initializeItems();
+            initializeGame();
+        }
+
+        private void initializeGame() {
             lineAdapter.initializeItems();
+            panelAdapter.initializeItems(lineAdapter.getItems());
         }
 
         private PanelItemAdapter getNewLineItemAdapter() {
